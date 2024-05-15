@@ -374,6 +374,7 @@ user_terminate(Acc, _Params, _Extra) ->
 maybe_handle_stream_mgmt_reroute(Acc, StateData, HostType, Reason, #sm_state{counter_in = H} = SmState)
   when ?IS_STREAM_MGMT_STOP(Reason) ->
     Sid = mongoose_c2s:get_sid(StateData),
+    ?LOG_DEBUG(#{what => maybe_handle_stream_mgmt_reroute, host_type => HostType, sid => Sid, reason => Reason, h => H}),
     do_remove_smid(HostType, Sid, H),
     NewSmState = handle_user_terminate(SmState, StateData, HostType),
     {ok, mongoose_c2s_acc:to_acc(Acc, state_mod, {?MODULE, NewSmState})};
@@ -745,17 +746,20 @@ c2s_stream_features(Acc, _, _) ->
     Params :: #{sid := ejabberd_sm:sid()},
     Extra :: gen_hook:extra().
 session_cleanup(Acc, #{sid := SID}, #{host_type := HostType}) ->
+    ?LOG_DEBUG(#{what => session_cleanup, host_type => HostType, sid => SID, acc => Acc}),
     {ok, remove_smid(Acc, HostType, SID)}.
 
 
 -spec remove_smid(mongoose_acc:t(), mongooseim:host_type(), ejabberd_sm:sid()) ->
     mongoose_acc:t().
 remove_smid(Acc, HostType, Sid) ->
+    ?LOG_DEBUG(#{what => remove_smid, host_type => HostType, sid => Sid, acc => Acc}),
     H = mongoose_acc:get(stream_mgmt, h, undefined, Acc),
     MaybeSMID = do_remove_smid(HostType, Sid, H),
     mongoose_acc:set(stream_mgmt, smid, MaybeSMID, Acc).
 
 do_remove_smid(HostType, Sid, H) ->
+    ?LOG_DEBUG(#{what => do_remove_smid, host_type => HostType, sid => Sid, h => H}),
     MaybeSMID = unregister_smid(HostType, Sid),
     case MaybeSMID of
         {ok, SMID} when H =/= undefined ->
@@ -922,6 +926,7 @@ register_smid(HostType, SMID, SID) ->
 -spec unregister_smid(mongooseim:host_type(), ejabberd_sm:sid()) ->
     {ok, SMID :: smid()} | {error, smid_not_found}.
 unregister_smid(HostType, SID) ->
+    ?LOG_DEBUG(#{what => unregister_smid, host_type => HostType, sid => SID}),
     mod_stream_management_backend:unregister_smid(HostType, SID).
 
 -spec get_sid(mongooseim:host_type(), smid()) ->
