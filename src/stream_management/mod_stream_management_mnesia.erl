@@ -66,6 +66,7 @@ unregister_smid(_HostType, SID) ->
         [] ->
             {error, smid_not_found};
         [#sm_session{smid = SMID}] ->
+            ?LOG_DEBUG(#{what => cp_sm_mnesia_unregister_smid, sid => SID, smid => SMID}),
             mnesia:dirty_delete(sm_session, SMID),
             {ok, SMID}
     end.
