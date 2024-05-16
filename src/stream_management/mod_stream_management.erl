@@ -463,6 +463,7 @@ do_handle_ack(#sm_state{counter_out = OldAcked,
                         buffer_size = BufferSize,
                         buffer = Buffer} = SmState, Acked) ->
     ToDrop = calc_to_drop(Acked, OldAcked),
+    ?LOG_DEBUG(#{what => cp_do_handle_ack, toDrop => ToDrop, acked => Acked, oldAcked => OldAcked, bufferSize => BufferSize, state => SmState, buffer => Buffer}),
     case BufferSize < ToDrop of
         true ->
             ErrorStanza0 = #xmlel{children = Children}
