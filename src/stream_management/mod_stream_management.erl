@@ -603,6 +603,7 @@ do_handle_resume(StateData, _C2SState, SMID, _H, {error, smid_not_found}) ->
       HookResult :: resume_return().
 do_resume(StateData, SMID) ->
     {_ReplacedPids, StateData2} = mongoose_c2s:open_session(StateData),
+    ?LOG_DEBUG(#{what => cp_do_resume, smid => SMID, replacedPids => _ReplacedPids, state => StateData, state2 => StateData2}),
     ok = register_smid(StateData2, SMID),
     {Resumed, ToForward} = get_all_stanzas_to_forward(StateData2, SMID),
     {ok, #{resumed => Resumed, forward => ToForward,
