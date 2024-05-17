@@ -329,6 +329,7 @@ handle_user_stopping(Acc, #{c2s_data := StateData}, #{host_type := HostType}) ->
         {error, not_found} ->
             {ok, Acc};
         SmState ->
+            ?LOG_DEBUG(#{what => cp_handle_user_stopping, host_type => HostType, c2s_data => StateData, acc => Acc}),
             Timeout = get_resume_timeout(HostType),
             NewSmState = notify_unacknowledged_messages(Acc, StateData, SmState),
             Actions = [{push_callback_module, ?MODULE}, {{timeout, ?MODULE}, Timeout, resume_timeout}, hibernate],
